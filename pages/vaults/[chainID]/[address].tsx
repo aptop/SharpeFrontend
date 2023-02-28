@@ -74,6 +74,7 @@ Index.getInitialProps = async ({query}: NextPageContext): Promise<unknown> => {
 	const	chainID = query?.chainID;
 	const	res = await fetch(`${process.env.YDAEMON_BASE_URI}/${chainID}/vaults/${address}?hideAlways=true&orderBy=apy.net_apy&orderDirection=desc&strategiesDetails=withDetails&strategiesRisk=withRisk&strategiesCondition=inQueue`);
 	const	json = await res.json();
+	console.log(json)
 
 	return {vaultData: json};
 };

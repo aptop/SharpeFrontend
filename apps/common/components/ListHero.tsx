@@ -116,7 +116,7 @@ function	ListHero<T extends string>({
 				<h2 suppressHydrationWarning className={'text-lg font-bold md:text-3xl'}>{headLabel}</h2>
 			</div>
 
-			<div className={'hidden w-full flex-row items-center justify-between space-x-4 md:flex'}>
+			{/* <div className={'hidden w-full flex-row items-center justify-between space-x-4 md:flex'}>
 				<SearchBar
 					searchLabel={searchLabel}
 					searchPlaceholder={searchPlaceholder}
@@ -126,7 +126,7 @@ function	ListHero<T extends string>({
 				<DesktopCategories
 					categories={categories}
 					onSelect={onSelect} />
-			</div>
+			</div> */}
 
 			<div className={'flex w-full flex-row space-x-2 md:hidden md:w-2/3'}>
 				<select

@@ -12,15 +12,18 @@ import {useMenu} from '@common/contexts/useMenu';
 import LogoYearn from '@common/icons/LogoYearn';
 import {YBribeHeader} from '@yBribe/components/header/YBribeHeader';
 import {YCrvHeader} from '@yCRV/components/header/YCrvHeader';
+import Image from 'next/image';
+const SharpeLogo = require('../../../public/SharpeLogo.png')
 
 import {AppName, APPS} from './Apps';
 import {MotionDiv} from './MotionDiv';
-
+import type {ImageProps} from 'next/image';
 import type {ReactElement} from 'react';
 import type {TMenu} from '@yearn-finance/web-lib/layouts/Header.next';
 
-function	Logo(): ReactElement {
+function Logo(): ReactElement {
 	const	{pathname} = useRouter();
+	
 
 	return (
 		<>
@@ -43,6 +46,7 @@ function	LogoPopover(): ReactElement {
 	const [isShowing, set_isShowing] = useState(false);
 
 	return (
+		// <img src={SharpeLogo}/>
 		<Popover
 			onMouseEnter={(): void => set_isShowing(true)}
 			onMouseLeave={(): void => set_isShowing(false)}
@@ -118,9 +122,9 @@ export function	AppHeader(): ReactElement {
 		}
 		return [
 			HOME_MENU,
-			{path: 'https://gov.yearn.finance/', label: 'Governance', target: '_blank'},
-			{path: 'https://blog.yearn.finance/', label: 'Blog', target: '_blank'},
-			{path: 'https://docs.yearn.finance/', label: 'Docs', target: '_blank'}
+			// {path: 'https://gov.yearn.finance/', label: 'Governance', target: '_blank'},
+			{path: 'https://sharpeai.medium.com/', label: 'Blog', target: '_blank'},
+			// {path: 'https://docs.yearn.finance/', label: 'Docs', target: '_blank'}
 		];
 	}, [pathname]);
 
@@ -139,11 +143,19 @@ export function	AppHeader(): ReactElement {
 			onOpenMenuMobile={onOpenMenu}
 			nav={menu}
 			supportedNetworks={supportedNetworks}
-			logo={(
-				<AnimatePresence mode={'wait'}>
-					<LogoPopover />
-				</AnimatePresence>
-			)}
+			logo={
+				(
+				// <AnimatePresence mode={'wait'}>
+				// 	<LogoPopover />
+				// </AnimatePresence>
+				<Image
+					alt={"alt"}
+					src={SharpeLogo}
+					loading={'eager'}
+					style={{width: "100px"}}
+				/>
+			)
+		}
 			extra={isActive ? (
 				<div className={'ml-4'}>
 					<BalanceReminderPopover />

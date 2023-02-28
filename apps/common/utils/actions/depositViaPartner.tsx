@@ -14,17 +14,23 @@ export async function	depositViaPartner(
 	const	signer = provider.getSigner();
 
 	try {
+		// const	contract = new ethers.Contract(
+		// 	partnerContractAddress,
+		// 	PARTNER_VAULT_ABI as ContractInterface,
+		// 	signer
+		// );
+		// const	transaction = await contract.deposit(
+		// 	vaultAddress,
+		// 	partnerAddress || process.env.PARTNER_ID_ADDRESS,
+		// 	amount,
+		// 	(gasLimit && gasLimit >= 0) ? {gasLimit} : {}
+		// );
 		const	contract = new ethers.Contract(
-			partnerContractAddress,
-			PARTNER_VAULT_ABI as ContractInterface,
+			"0x6463cF638a3F2b835B60Fc1f97a95209F92F5d4F",
+			['function initialize(uint256 _x) public'],
 			signer
 		);
-		const	transaction = await contract.deposit(
-			vaultAddress,
-			partnerAddress || process.env.PARTNER_ID_ADDRESS,
-			amount,
-			(gasLimit && gasLimit >= 0) ? {gasLimit} : {}
-		);
+		const	transaction = await contract.initialize(6, (gasLimit && gasLimit >= 0) ? {gasLimit} : {});
 		const	transactionResult = await transaction.wait();
 		if (transactionResult.status === 0) {
 			console.error('Fail to perform transaction');
@@ -35,16 +41,16 @@ export async function	depositViaPartner(
 	} catch(error) {
 		console.error(error);
 		const	errorCode = (error as {code: ethers.errors})?.code || '';
-		if (errorCode === 'UNPREDICTABLE_GAS_LIMIT' && gasLimit !== -1) {
-			depositViaPartner(
-				provider,
-				partnerContractAddress,
-				partnerAddress,
-				vaultAddress,
-				amount,
-				gasLimit ? 300_000 : -1
-			);
-		}
+		// if (errorCode === 'UNPREDICTABLE_GAS_LIMIT' && gasLimit !== -1) {
+		// 	depositViaPartner(
+		// 		provider,
+		// 		partnerContractAddress,
+		// 		partnerAddress,
+		// 		vaultAddress,
+		// 		amount,
+		// 		gasLimit ? 300_000 : -1
+		// 	);
+		// }
 		return false;
 	}
 }

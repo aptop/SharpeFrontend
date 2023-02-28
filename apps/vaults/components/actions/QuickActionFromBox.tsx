@@ -96,7 +96,9 @@ export function	QuickActionFromBox({
 					</div>
 				</div>
 				<legend className={'font-number mr-1 text-end text-xs text-neutral-600 md:mr-0 md:text-start'}>
-					{formatCounterValue(amount?.normalized || 0, selectedOptionFromPricePerToken)}
+					{formatCounterValue(amount?.normalized || 0, selectedOptionFromPricePerToken)} 
+					 {isDepositing ? " + 0.09% flashloan fee" : "" }
+					
 				</legend>
 			</div>
 		</section>

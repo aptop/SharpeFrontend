@@ -11,40 +11,41 @@ import type {ReactElement} from 'react';
 const	apps = [
 	{
 		href: '/vaults',
-		title: 'Vaults',
-		description: 'deposit tokens and receive yield.',
+		title: 'Magnum',
+		description: 'Leveraged liquid Stacking',
 		icon: <LogoYearn
 			className={'h-[100px] w-[100px]'}
 			back={'text-pink-400'}
 			front={'text-white'} />
-	}, {
-		href: '/ycrv',
-		title: 'yCRV',
-		description: 'get the best CRV yields in DeFi.',
-		icon: <Image
-			alt={'yCRV'}
-			width={100}
-			height={100}
-			src={`${process.env.BASE_YEARN_ASSETS_URI}/1/${YCRV_TOKEN_ADDRESS}/logo-128.png`}
-			loading={'eager'}
-			priority />
-	}, {
-		href: '/veyfi',
-		title: 'veYFI',
-		description: 'lock YFI\nto take part in governance.',
-		icon: <LogoYearn
-			className={'h-[100px] w-[100px]'}
-			back={'text-primary'}
-			front={'text-white'} />
-	}, {
-		href: '/ybribe',
-		title: 'yBribe',
-		description: 'sell votes, or buy them.\njust like democracy.',
-		icon: <LogoYearn
-			className={'h-[100px] w-[100px]'}
-			back={'text-neutral-900'}
-			front={'text-neutral-0'} />
 	}
+	// ,{
+	// 	href: '/ycrv',
+	// 	title: 'yCRV',
+	// 	description: 'get the best CRV yields in DeFi.',
+	// 	icon: <Image
+	// 		alt={'yCRV'}
+	// 		width={100}
+	// 		height={100}
+	// 		src={`${process.env.BASE_YEARN_ASSETS_URI}/1/${YCRV_TOKEN_ADDRESS}/logo-128.png`}
+	// 		loading={'eager'}
+	// 		priority />
+	// }, {
+	// 	href: '/veyfi',
+	// 	title: 'veYFI',
+	// 	description: 'lock YFI\nto take part in governance.',
+	// 	icon: <LogoYearn
+	// 		className={'h-[100px] w-[100px]'}
+	// 		back={'text-primary'}
+	// 		front={'text-white'} />
+	// }, {
+	// 	href: '/ybribe',
+	// 	title: 'yBribe',
+	// 	description: 'sell votes, or buy them.\njust like democracy.',
+	// 	icon: <LogoYearn
+	// 		className={'h-[100px] w-[100px]'}
+	// 		back={'text-neutral-900'}
+	// 		front={'text-neutral-0'} />
+	// }
 ];
 
 function	AppBox({app}: {app: typeof apps[0]}): ReactElement {
@@ -190,20 +191,20 @@ function	Index(): ReactElement {
 	return (
 		<>
 			<div className={'mx-auto mt-6 mb-10 flex flex-col justify-center md:mt-20 md:mb-14'}>
-				<div className={'relative h-12 w-[300px] self-center md:h-[104px] md:w-[600px]'}>
+				{/* <div className={'relative h-12 w-[300px] self-center md:h-[104px] md:w-[600px]'}>
 					<TextAnimation />
-				</div>
+				</div> */}
 				<div className={'my-8'}>
 					<p className={'text-center text-lg md:text-2xl'}>
-						{'With '}
-						<b>{'Yearn'}</b>
-						{'. The Yield Protocol.'}
+						{'Yield dapps built on '}
+						<b>{'Sharpe'}</b>
+						{/* {'. The Yield Protocol.'} */}
 					</p>
 				</div>
 				<div className={'mb-6'}>
 					
 					<p className={'text-center text-sm text-neutral-500 md:text-base'}>
-						<Balancer>{'Yearn is a decentralized suite of products helping individuals, DAOs, and other protocols\nearn yield on their digital assets.'}</Balancer>
+						<Balancer>{'Sharpe Labs is a DeFi R&D lab that creates open-source innovative investment solutions using our Institutional-Grade Asset Management tooling and infrastructure.'}</Balancer>
 					</p>
 				</div>
 			</div>

@@ -1,5 +1,7 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState, useCallback, useEffect} from 'react';
+import {ethers} from "ethers"
 import Link from 'next/link';
+import CloneEl from "../../../../pages/vaults/[chainID]/StEth"
 import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
 import {toAddress} from '@yearn-finance/web-lib/utils/address';
 import {ETH_TOKEN_ADDRESS, WETH_TOKEN_ADDRESS, WFTM_TOKEN_ADDRESS} from '@yearn-finance/web-lib/utils/constants';
@@ -8,17 +10,57 @@ import {formatAmount} from '@yearn-finance/web-lib/utils/format.number';
 import {ImageWithFallback} from '@common/components/ImageWithFallback';
 import {useBalance} from '@common/hooks/useBalance';
 import {formatPercent, formatUSD, getVaultName} from '@common/utils';
+import {useTokenPrice} from '@common/hooks/useTokenPrice';
+import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
+import {formatToNormalizedValue} from '@yearn-finance/web-lib/utils/format.bigNumber';
 
+import {formatCounterValue} from '@yearn-finance/web-lib/utils/format.value';
+import {getProvider} from '@yearn-finance/web-lib/utils/web3/providers';
+
+import type {BigNumber} from 'ethers';
 import type {ReactElement} from 'react';
 import type {TYearnVault} from '@common/types/yearn';
 
 function	VaultsListRow({currentVault}: {currentVault: TYearnVault}): ReactElement {
+	const {address, provider} = useWeb3();
 	const {safeChainID} = useChainID();
+	const [tvlValue, set_tvlValue] = useState("");
 	const balanceOfWant = useBalance(currentVault.token.address);
 	const balanceOfCoin = useBalance(ETH_TOKEN_ADDRESS);
 	const balanceOfWrappedCoin = useBalance(toAddress(currentVault.token.address) === WFTM_TOKEN_ADDRESS ? WFTM_TOKEN_ADDRESS : WETH_TOKEN_ADDRESS);
 	const deposited = useBalance(currentVault.address)?.normalized;
 	const vaultName = useMemo((): string => getVaultName(currentVault), [currentVault]);
+
+	const tvlFetcher = useCallback(async (): Promise<{raw: BigNumber, normalized: number}> => {
+		
+		const	currentProvider = provider || getProvider(safeChainID);
+		const	contract = new ethers.Contract(
+			currentVault.address,
+			['function getVaultsActualBalance() public view returns (uint)'],
+			currentProvider
+		);
+
+		try {
+			const	getVaultsActualBalance = await contract.getVaultsActualBalance() || ethers.constants.Zero;
+			const	effectiveAllowance = ({
+				raw: getVaultsActualBalance,
+				normalized: formatToNormalizedValue(getVaultsActualBalance || ethers.constants.Zero, currentVault?.decimals)
+			});
+			return effectiveAllowance;
+		} catch (error) {
+			return ({raw: ethers.constants.Zero, normalized: 0});
+		}
+	}, [address, currentVault?.decimals, provider, safeChainID]);
+
+	const selectedOptionFromPricePerToken = useTokenPrice(toAddress(currentVault.token.address));
+
+	useEffect(() => {
+		const getter = async () => {
+			let {raw} = await tvlFetcher();
+			set_tvlValue(raw.toString())
+		}
+		getter()
+	}, []);
 
 	const availableToDeposit = useMemo((): number => {
 		// Handle ETH native coin
@@ -32,7 +74,7 @@ function	VaultsListRow({currentVault}: {currentVault: TYearnVault}): ReactElemen
 	}, [balanceOfCoin.normalized, balanceOfCoin.raw, balanceOfWant.normalized, balanceOfWrappedCoin.normalized, currentVault.token.address]);
 	
 	return (
-		<Link key={`${currentVault.address}`} href={`/vaults/${safeChainID}/${toAddress(currentVault.address)}`}>
+		<Link key={`${currentVault.address}`} href={`/vaults/${safeChainID}/StEth`}>
 			<div className={'yearn--table-wrapper cursor-pointer transition-colors hover:bg-neutral-300'}>
 				<div className={'yearn--table-token-section'}>
 					<div className={'yearn--table-token-section-item'}>
@@ -80,7 +122,7 @@ function	VaultsListRow({currentVault}: {currentVault: TYearnVault}): ReactElemen
 					<div className={'yearn--table-data-section-item md:col-span-2'} datatype={'number'}>
 						<label className={'yearn--table-data-section-item-label !font-aeonik'}>{'TVL'}</label>
 						<p className={'yearn--table-data-section-item-value'}>
-							{formatUSD(currentVault.tvl?.tvl || 0, 0, 0)}
+							{formatCounterValue(formatToNormalizedValue(tvlValue || ethers.constants.Zero, currentVault.token.decimals) || 0, selectedOptionFromPricePerToken)}
 						</p>
 					</div>
 				</div>

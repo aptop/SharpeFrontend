@@ -23,7 +23,7 @@ function	VaultDetailsAbout({currentVault, harvestData}: {currentVault: TYearnVau
 					<b className={'text-neutral-900'}>{'APY'}</b>
 					<div className={'mt-4 grid grid-cols-1 gap-x-12 md:grid-cols-2'}>
 						<div className={'space-y-2'}>
-							<div className={'flex flex-row items-center justify-between'}>
+							{/* <div className={'flex flex-row items-center justify-between'}>
 								<p className={'text-sm text-neutral-500'}>{'Weekly APY'}</p>
 								<p className={'font-number text-sm text-neutral-900'} suppressHydrationWarning>
 									{formatPercent((currentVault?.apy?.points?.week_ago || 0) * 100)}
@@ -40,10 +40,18 @@ function	VaultDetailsAbout({currentVault, harvestData}: {currentVault: TYearnVau
 								<p className={'font-number text-sm text-neutral-900'} suppressHydrationWarning>
 									{formatPercent((currentVault?.apy?.points?.inception || 0) * 100)}
 								</p>
+							</div> */}
+							<div className={'flex flex-row items-center justify-between'}>
+								<p className={'text-sm text-neutral-500'}>{'Net APY'}</p>
+								<p className={'font-number text-sm text-neutral-900'} suppressHydrationWarning>
+								{(currentVault?.apy?.net_apy || 0) > 5 ? (
+										`≧ ${formatPercent(500)}`
+									) : formatPercent((currentVault?.apy?.net_apy || 0) * 100)}
+								</p>
 							</div>
 						</div>
 						<div className={'space-y-2'}>
-							<div className={'flex flex-row items-center justify-between'}>
+							{/* <div className={'flex flex-row items-center justify-between'}>
 								<p className={'text-sm text-neutral-500'}>{'Gross APR'}</p>
 								<p className={'font-number text-sm text-neutral-900'} suppressHydrationWarning>
 									{formatPercent((currentVault?.apy?.gross_apr || 0) * 100)}
@@ -56,13 +64,13 @@ function	VaultDetailsAbout({currentVault, harvestData}: {currentVault: TYearnVau
 										`≧ ${formatPercent(500)}`
 									) : formatPercent((currentVault?.apy?.net_apy || 0) * 100)}
 								</p>
-							</div>
+							</div> */}
 						</div>
 					</div>
 				</div>
 			</div>
 			<div className={'col-span-1 w-full space-y-8'}>
-				<div>
+				{/* <div>
 					<b className={'text-neutral-900'}>{'Yearn Fees'}</b>
 					<div className={'mt-4 flex flex-row space-x-6 md:space-x-8'}>
 						<div className={'flex flex-col space-y-0 md:space-y-2'}>
@@ -84,7 +92,7 @@ function	VaultDetailsAbout({currentVault, harvestData}: {currentVault: TYearnVau
 							</b>
 						</div>
 					</div>
-				</div>
+				</div> */}
 				<div>
 					<b className={'text-neutral-900'}>{'Cumulative Earnings'}</b>
 					<div className={'-mx-2 mt-4 flex flex-row border-b border-l border-neutral-300 md:mx-0'} style={{height: 160}}>

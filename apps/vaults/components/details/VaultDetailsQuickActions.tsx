@@ -79,7 +79,7 @@ function	ActionButton({
 	const {currentPartner} = useYearn();
 	const [txStatusApprove, set_txStatusApprove] = useState(defaultTxStatus);
 	const [txStatusDeposit, set_txStatusDeposit] = useState(defaultTxStatus);
-
+	console.log(ETH_TOKEN_ADDRESS)
 	const isInputTokenEth = selectedOptionFrom?.value === ETH_TOKEN_ADDRESS;
 	const isOutputTokenEth = selectedOptionTo?.value === ETH_TOKEN_ADDRESS;
 	const isPartnerAddressValid = useMemo((): boolean => !isZeroAddress(toAddress(networks[safeChainID]?.partnerContractAddress)), [networks, safeChainID]);
@@ -179,7 +179,7 @@ function	ActionButton({
 			await mutateAllowance();
 		}).perform();
 	}
-
+	console.log("selectedOptionTo ", selectedOptionTo)
 	/* 🔵 - Yearn Finance ******************************************************
 	** Trigger a deposit web3 action, simply trying to deposit `amount` tokens to
 	** the selected vault.
@@ -267,35 +267,38 @@ function	ActionButton({
 	**************************************************************************/
 	async function	onDepositOrWithdraw(): Promise<void> {
 		if (isDepositing) {
-			if (isInputTokenEth) {
-				await onDepositEth();
-			} else if (isUsingPartnerContract) {
-				await onDepositViaPartner();
-			} else {
-				await onDepositToVault();
-			}
+			// if (isInputTokenEth) {
+			// 	await onDepositEth();
+			// } else if (isUsingPartnerContract) {
+			// 	await onDepositViaPartner();
+			// } else {
+			// 	await onDepositToVault();
+			// }
+			await onDepositToVault();
 		} else {
-			if (isOutputTokenEth) {
-				await onWithdrawEth();
-			} else {
-				await onWithdrawShares();
-			}
+			// if (isOutputTokenEth) {
+			// 	await onWithdrawEth();
+			// } else {
+			// 	await onWithdrawShares();
+			// }
+			await onWithdrawShares();
 		}
 	}
-
-	if ((txStatusApprove.pending || amount.raw.gt(allowanceFrom?.raw || 0)) && (
-		(isDepositing && !isInputTokenEth) || (!isDepositing && isOutputTokenEth)
-	)) {
-		return (
-			<Button
-				className={'w-full'}
-				isBusy={txStatusApprove.pending || isValidatingAllowance}
-				isDisabled={!isActive || amount.raw.isZero() || (amount.raw).gt(max.raw)}
-				onClick={isOutputTokenEth ? onApproveTo : onApproveFrom}>
-				{'Approve'}
-			</Button>
-		);
-	}
+	
+	// if (
+	// 	(txStatusApprove.pending || amount.raw.gt(allowanceFrom?.raw || 0)) && (
+	// 	(isDepositing && !isInputTokenEth) || (!isDepositing && isOutputTokenEth)
+	// )) {
+	// 	return (
+	// 		<Button
+	// 			className={'w-full'}
+	// 			isBusy={txStatusApprove.pending || isValidatingAllowance}
+	// 			isDisabled={!isActive || amount.raw.isZero() || (amount.raw).gt(max.raw)}
+	// 			onClick={isOutputTokenEth ? onApproveTo : onApproveFrom}>
+	// 			{'Approve'}
+	// 		</Button>
+	// 	);
+	// }
 
 	return (
 		<Button
@@ -407,11 +410,11 @@ function	VaultDetailsQuickActions({currentVault}: {currentVault: TYearnVault}): 
 		const	currentProvider = provider || getProvider(chainID);
 		const	contract = new ethers.Contract(
 			toAddress(isDepositing ? _outputToken.value : _inputToken.value),
-			['function pricePerShare() public view returns (uint256)'],
+			['function assetsPerShare() public view returns (uint256)'],
 			currentProvider
 		);
 		try {
-			const	pps = await contract.pricePerShare() || ethers.constants.Zero;
+			const	pps = await contract.assetsPerShare() || ethers.constants.Zero;
 			if (isDepositing) {
 				const	expectedOutFetched = _amountIn.mul(formatBN(10).pow(_outputToken?.decimals)).div(pps);
 				return ({

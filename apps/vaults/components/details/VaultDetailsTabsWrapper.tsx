@@ -31,8 +31,8 @@ type TTabs = {
 function	Tabs({selectedAboutTabIndex, set_selectedAboutTabIndex}: TTabs): ReactElement {
 	const tabs: TTabsOptions[] = [
 		{value: 0, label: 'About'},
-		{value: 1, label: 'Strategies'},
-		{value: 2, label: 'Historical rates'}
+		// {value: 1, label: 'Strategies'},
+		// {value: 2, label: 'Historical rates'}
 	];
 
 	return (

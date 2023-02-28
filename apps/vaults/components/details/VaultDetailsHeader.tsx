@@ -1,5 +1,6 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState, useEffect, useCallback} from 'react';
 import useSWR from 'swr';
+import {ethers} from 'ethers';
 import {useSettings} from '@yearn-finance/web-lib/contexts/useSettings';
 import {useWeb3} from '@yearn-finance/web-lib/contexts/useWeb3';
 import {useChainID} from '@yearn-finance/web-lib/hooks/useChainID';
@@ -12,20 +13,24 @@ import {copyToClipboard} from '@yearn-finance/web-lib/utils/helpers';
 import {useBalance} from '@common/hooks/useBalance';
 import {useTokenPrice} from '@common/hooks/useTokenPrice';
 import {formatPercent, formatUSD, getVaultName} from '@common/utils';
+import {getProvider} from '@yearn-finance/web-lib/utils/web3/providers';
 
+import type {BigNumber} from 'ethers';
 import type {ReactElement} from 'react';
 import type {SWRResponse} from 'swr';
 import type {TYdaemonEarned, TYearnVault} from '@common/types/yearn';
 
 function	VaultDetailsHeader({currentVault}: {currentVault: TYearnVault}): ReactElement {
 	const {safeChainID} = useChainID();
-	const {address} = useWeb3();
+	const {address, provider} = useWeb3();
 	const {settings: baseAPISettings} = useSettings();
 	const {data: earned} = useSWR(
 		currentVault.address && address ? `${baseAPISettings.yDaemonBaseURI}/${safeChainID}/earned/${address}/${currentVault.address}` : null,
 		baseFetcher,
 		{revalidateOnFocus: false}
 	) as SWRResponse as {data: TYdaemonEarned};
+	
+	const selectedOptionFromPricePerToken = useTokenPrice(toAddress(currentVault.token.address));
 
 	const	normalizedVaultEarned = useMemo((): number => (
 		formatToNormalizedValue(
@@ -37,6 +42,38 @@ function	VaultDetailsHeader({currentVault}: {currentVault: TYearnVault}): ReactE
 	const	vaultBalance = useBalance(currentVault?.address)?.normalized;
 	const	vaultPrice = useTokenPrice(currentVault?.address);
 	const	vaultName = useMemo((): string => getVaultName(currentVault), [currentVault]);
+
+	const [tvlValue, set_tvlValue] = useState("");
+
+	const tvlFetcher = useCallback(async (): Promise<{raw: BigNumber, normalized: number}> => {
+		
+		const	currentProvider = provider || getProvider(safeChainID);
+		const	contract = new ethers.Contract(
+			currentVault.address,
+			['function getVaultsActualBalance() public view returns (uint)'],
+			currentProvider
+		);
+
+		try {
+			const	getVaultsActualBalance = await contract.getVaultsActualBalance() || ethers.constants.Zero;
+			const	effectiveAllowance = ({
+				raw: getVaultsActualBalance,
+				normalized: formatToNormalizedValue(getVaultsActualBalance || ethers.constants.Zero, currentVault?.decimals)
+			});
+			return effectiveAllowance;
+		} catch (error) {
+			return ({raw: ethers.constants.Zero, normalized: 0});
+		}
+	}, [address, currentVault?.decimals, provider, safeChainID]);
+
+	useEffect(() => {
+		const getter = async () => {
+			let {raw} = await tvlFetcher();
+			set_tvlValue(raw.toString())
+		}
+		getter()
+	  }, []);
+	
 
 	return (
 		<div aria-label={'Vault Header'} className={'col-span-12 flex w-full flex-col items-center justify-center'}>
@@ -56,10 +93,10 @@ function	VaultDetailsHeader({currentVault}: {currentVault: TYearnVault}): ReactE
 						{`Total deposited, ${currentVault?.symbol || 'token'}`}
 					</p>
 					<b className={'font-number text-lg md:text-3xl'} suppressHydrationWarning>
-						{formatAmount(formatToNormalizedValue(currentVault?.tvl?.total_assets, currentVault?.decimals))}
+						{formatAmount(formatToNormalizedValue(tvlValue, currentVault?.decimals))}
 					</b>
 					<legend className={'font-number text-xxs text-neutral-600 md:text-xs'} suppressHydrationWarning>
-						{formatUSD(currentVault?.tvl?.tvl)}
+						{formatCounterValue(formatToNormalizedValue(tvlValue || ethers.constants.Zero, currentVault.token.decimals) || 0, selectedOptionFromPricePerToken)}
 					</legend>
 				</div>
 
